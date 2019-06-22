@@ -9,28 +9,30 @@ class BrandController extends Controller
 {
     public function all()
     {
-        $brands = Brand::orderBy("id","DESC")->paginate(10);
+        $brands = Brand::orderBy("id", "DESC")->paginate(10);
         return $this->success($brands);
     }
 
     public function show($id)
     {
-        $brand = Brand::find($id);
+        $brand = Brand::with(["racket" => function ($racket) { 
+            $racket->orderBy("id","DESC")->paginate(10);
+        }])->find($id);
         return $this->success($brand);
     }
 
     public function all_by_name()
     {
-        $brands = Brand::orderBy("name","ASC")->get();
+        $brands = Brand::orderBy("name", "ASC")->get();
         return $this->success($brands);
     }
 
     public function search(Request $request)
     {
-        $brands = Brand::where("name","LIKE","%".$request->query("q")."%")
-        ->orderBy("id","DESC")
-        ->take(15)
-        ->get();
+        $brands = Brand::where("name", "LIKE", "%" . $request->query("q") . "%")
+            ->orderBy("id", "DESC")
+            ->take(15)
+            ->get();
 
         return $this->success($brands);
     }
